@@ -51,3 +51,5 @@ notifications:
     channels:
       - secure: "JP57f61QovrhmLoAF6oPOzIK2aXGfSO06FHg7yiuKBOWMiaxQejZUGJX919muCLhWJXDugsviIqCMoAWwNV3o1WQbqIr+G5TR+N9MrtCs4Zi6vpGj09bR8giKUKx+PPKEoe1Ew56E4y2LxzGO4Lj9hZx8M2YVdwPNWrWZgp6WXE="
     on_success: change
+after_success:
+  - codecov
