@@ -57,7 +57,7 @@ Why the name "Pelican"?
 .. _`hosted on GitHub`: https://github.com/getpelican/pelican
 
 .. |build-status| image:: https://img.shields.io/travis/getpelican/pelican/master.svg
-   :target: https://travis-ci.org/getpelican/pelican
+   :target: https://travis-ci.org/starworldx/pelican.svg?branch=master   
    :alt: Travis CI: continuous integration status
 .. |pypi-version| image:: https://img.shields.io/pypi/v/pelican.svg
    :target: https://pypi.python.org/pypi/pelican
