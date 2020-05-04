@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import datetime
 import logging
 import os
@@ -101,7 +99,7 @@ def _filter_discardable_metadata(metadata):
     return {name: val for name, val in metadata.items() if val is not _DISCARD}
 
 
-class BaseReader(object):
+class BaseReader:
     """Base class to read files.
 
     This class is used to process static files, and it can be inherited for
@@ -585,6 +583,14 @@ class Readers(FileStampDataCacher):
             from typogrify.filters import typogrify
             import smartypants
 
+            typogrify_dashes = self.settings['TYPOGRIFY_DASHES']
+            if typogrify_dashes == 'oldschool':
+                smartypants.Attr.default = smartypants.Attr.set2
+            elif typogrify_dashes == 'oldschool_inverted':
+                smartypants.Attr.default = smartypants.Attr.set3
+            else:
+                smartypants.Attr.default = smartypants.Attr.set1
+
             # Tell `smartypants` to also replace &quot; HTML entities with
             # smart quotes. This is necessary because Docutils has already
             # replaced double quotes with said entities by the time we run
@@ -679,6 +685,7 @@ def path_metadata(full_path, source_path, settings=None):
         if settings.get('DEFAULT_DATE', None) == 'fs':
             metadata['date'] = datetime.datetime.fromtimestamp(
                 os.stat(full_path).st_mtime)
+            metadata['modified'] = metadata['date']
 
         # Apply EXTRA_PATH_METADATA for the source path and the paths of any
         # parent directories. Sorting EPM first ensures that the most specific

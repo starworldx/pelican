@@ -98,7 +98,10 @@ Basic settings
    should map the filtername to the filter function.
 
    Example::
+    import sys
+    sys.path.append('to/your/path')
 
+    from custom_filter import urlencode_filter
     JINJA_FILTERS = {'urlencode': urlencode_filter}
 
    See: `Jinja custom filters documentation`_.
@@ -168,7 +171,8 @@ Basic settings
 
 .. data:: OUTPUT_PATH = 'output/'
 
-   Where to output the generated files.
+   Where to output the generated files. This should correspond to your web
+   server's virtual host root directory.
 
 .. data:: PATH
 
@@ -275,6 +279,17 @@ Basic settings
    ``pre`` and ``code`` tags. This requires that Typogrify version 2.0.4 or
    later is installed
 
+.. data:: TYPOGRIFY_DASHES = 'default'
+
+   This setting controls how Typogrify sets up the Smartypants filter to
+   interpret multiple dash/hyphen/minus characters. A single ASCII dash
+   character (``-``) is always rendered as a hyphen. The ``default`` setting
+   does not handle en-dashes and converts double-hyphens into em-dashes. The
+   ``oldschool`` setting renders both en-dashes and em-dashes when it sees two
+   (``--``) and three (``---``) hyphen characters, respectively. The
+   ``oldschool_inverted`` setting turns two hyphens into an em-dash and three
+   hyphens into an en-dash.
+
 .. data:: SUMMARY_MAX_LENGTH = 50
 
    When creating a short summary of an article, this will be the default length
@@ -304,12 +319,6 @@ Basic settings
 
    A list of default Pygments settings for your reStructuredText code blocks.
    See :ref:`internal_pygments_options` for a list of supported options.
-
-.. data:: SLUGIFY_SOURCE = 'title'
-
-   Specifies where you want the slug to be automatically generated from. Can be
-   set to ``title`` to use the 'Title:' metadata tag or ``basename`` to use the
-   article's file name when creating the slug.
 
 .. data:: CACHE_CONTENT = False
 
@@ -358,6 +367,7 @@ Basic settings
 
    The IP to which to bind the HTTP server.
 
+.. _url-settings:
 
 URL settings
 ============
@@ -377,6 +387,12 @@ variables allow you to place your articles in a location such as
 ``{slug}/index.html`` and link to them as ``{slug}`` for clean URLs (see
 example below). These settings give you the flexibility to place your articles
 and pages anywhere you want.
+
+.. note::
+    If a ``*_SAVE_AS`` setting contains a parent directory that doesn't match
+    the parent directory inside the corresponding ``*_URL`` setting, this may
+    cause Pelican to generate unexpected URLs in a few cases, such as when
+    using the ``{attach}`` syntax.
 
 If you don't want that flexibility and instead prefer that your generated
 output paths mirror your source content's filesystem path hierarchy, try the
@@ -598,6 +614,23 @@ URLs for direct template pages are theme-dependent. Some themes use
 corresponding ``*_URL`` setting as string, while others hard-code them:
 ``'archives.html'``, ``'authors.html'``, ``'categories.html'``,
 ``'tags.html'``.
+
+.. data:: SLUGIFY_SOURCE = 'title'
+
+   Specifies from where you want the slug to be automatically generated. Can be
+   set to ``title`` to use the "Title:" metadata tag or ``basename`` to use the
+   article's file name when creating the slug.
+
+.. data:: SLUGIFY_USE_UNICODE = False
+
+   Allow Unicode characters in slugs. Set ``True`` to keep Unicode characters
+   in auto-generated slugs. Otherwise, Unicode characters will be replaced
+   with ASCII equivalents.
+
+.. data:: SLUGIFY_PRESERVE_CASE = False
+
+   Preserve uppercase characters in slugs. Set ``True`` to keep uppercase
+   characters from ``SLUGIFY_SOURCE`` as-is.
 
 .. data:: SLUG_REGEX_SUBSTITUTIONS = [
         (r'[^\\w\\s-]', ''),  # remove non-alphabetical/whitespace/'-' chars
@@ -1207,20 +1240,6 @@ Feel free to use them in your themes as well.
 
    A list of tuples (Title, URL) for additional menu items to appear at the
    beginning of the main menu.
-
-.. data:: PIWIK_URL
-
-   URL to your Piwik server - without 'http://' at the beginning.
-
-.. data:: PIWIK_SSL_URL
-
-   If the SSL-URL differs from the normal Piwik-URL you have to include this
-   setting too. (optional)
-
-.. data:: PIWIK_SITE_ID
-
-   ID for the monitored website. You can find the ID in the Piwik admin
-   interface > Settings > Websites.
 
 .. data:: LINKS
 

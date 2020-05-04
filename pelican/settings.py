@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import copy
 import importlib.util
 import inspect
@@ -138,6 +136,7 @@ DEFAULT_CONFIG = {
     'ARTICLE_PERMALINK_STRUCTURE': '',
     'TYPOGRIFY': False,
     'TYPOGRIFY_IGNORE_TAGS': [],
+    'TYPOGRIFY_DASHES': 'default',
     'SUMMARY_END_MARKER': '…',
     'SUMMARY_MAX_LENGTH': 50,
     'PLUGIN_PATHS': [],
@@ -154,6 +153,8 @@ DEFAULT_CONFIG = {
     ],
     'INTRASITE_LINK_REGEX': '[{|](?P<what>.*?)[|}]',
     'SLUGIFY_SOURCE': 'title',
+    'SLUGIFY_USE_UNICODE': False,
+    'SLUGIFY_PRESERVE_CASE': False,
     'CACHE_CONTENT': False,
     'CONTENT_CACHING_LAYER': 'reader',
     'CACHE_PATH': 'cache',
@@ -607,7 +608,7 @@ def configure_settings(settings):
         logger.warning(
             'No timezone information specified in the settings. Assuming'
             ' your timezone is UTC for feed generation. Check '
-            'http://docs.getpelican.com/en/latest/settings.html#timezone '
+            'https://docs.getpelican.com/en/latest/settings.html#TIMEZONE '
             'for more information')
 
     # fix up pagination rules

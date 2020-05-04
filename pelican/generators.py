@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import calendar
 import errno
 import fnmatch
@@ -28,7 +26,7 @@ class PelicanTemplateNotFound(Exception):
     pass
 
 
-class Generator(object):
+class Generator:
     """Baseclass generator"""
 
     def __init__(self, context, settings, path, theme, output_path,
@@ -262,7 +260,7 @@ class _FileLoader(BaseLoader):
         if template != self.path or not os.path.exists(self.fullpath):
             raise TemplateNotFound(template)
         mtime = os.path.getmtime(self.fullpath)
-        with open(self.fullpath, 'r', encoding='utf-8') as f:
+        with open(self.fullpath, encoding='utf-8') as f:
             source = f.read()
         return (source, self.fullpath,
                 lambda: mtime == os.path.getmtime(self.fullpath))
@@ -799,8 +797,7 @@ class StaticGenerator(Generator):
 
     def generate_context(self):
         self.staticfiles = []
-        linked_files = {os.path.join(self.path, path)
-                        for path in self.context['static_links']}
+        linked_files = set(self.context['static_links'])
         found_files = self.get_files(self.settings['STATIC_PATHS'],
                                      exclude=self.settings['STATIC_EXCLUDES'],
                                      extensions=False)

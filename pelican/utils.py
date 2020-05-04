@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import datetime
 import fnmatch
 import locale
@@ -99,7 +97,7 @@ class SafeDatetime(datetime.datetime):
             return super().strftime(fmt)
 
 
-class DateFormatter(object):
+class DateFormatter:
     '''A date formatter object used as a jinja filter
 
     Uses the `strftime` implementation and makes sure jinja uses the locale
@@ -125,7 +123,7 @@ class DateFormatter(object):
         return formatted
 
 
-class memoized(object):
+class memoized:
     """Function decorator to cache return values.
 
     If called later with the same arguments, the cached value is returned
@@ -209,7 +207,7 @@ def get_date(string):
     try:
         return dateutil.parser.parse(string, default=default)
     except (TypeError, ValueError):
-        raise ValueError('{0!r} is not a valid date'.format(string))
+        raise ValueError('{!r} is not a valid date'.format(string))
 
 
 @contextmanager
@@ -222,7 +220,7 @@ def pelican_open(filename, mode='r', strip_crs=(sys.platform == 'win32')):
     yield content
 
 
-def slugify(value, regex_subs=()):
+def slugify(value, regex_subs=(), preserve_case=False, use_unicode=False):
     """
     Normalizes string, converts to lowercase, removes non-alpha characters,
     and converts spaces to hyphens.
@@ -230,27 +228,36 @@ def slugify(value, regex_subs=()):
     Took from Django sources.
     """
 
-    # TODO Maybe steal again from current Django 1.5dev
-    value = Markup(value).striptags()
-    # value must be unicode per se
     import unicodedata
-    from unidecode import unidecode
-    value = unidecode(value)
-    if isinstance(value, bytes):
-        value = value.decode('ascii')
-    # still unicode
-    value = unicodedata.normalize('NFKD', value)
+    import unidecode
 
+    def normalize_unicode(text):
+        # normalize text by compatibility composition
+        # see: https://en.wikipedia.org/wiki/Unicode_equivalence
+        return unicodedata.normalize('NFKC', text)
+
+    # strip tags from value
+    value = Markup(value).striptags()
+
+    # normalization
+    value = normalize_unicode(value)
+
+    if not use_unicode:
+        # ASCII-fy
+        value = unidecode.unidecode(value)
+
+    # perform regex substitutions
     for src, dst in regex_subs:
-        value = re.sub(src, dst, value, flags=re.IGNORECASE)
+        value = re.sub(
+            normalize_unicode(src),
+            normalize_unicode(dst),
+            value,
+            flags=re.IGNORECASE)
 
-    # convert to lowercase
-    value = value.lower()
+    if not preserve_case:
+        value = value.lower()
 
-    # we want only ASCII chars
-    value = value.encode('ascii', 'ignore').strip()
-    # but Pelican should generally use only unicode
-    return value.decode('ascii')
+    return value.strip()
 
 
 def copy(source, destination, ignores=None):
@@ -609,11 +616,11 @@ def process_translations(content_list, translation_id=None):
         content_list.sort(key=attrgetter(*translation_id))
     except TypeError:
         raise TypeError('Cannot unpack {}, \'translation_id\' must be falsy, a'
-                        'string or a collection of strings'
+                        ' string or a collection of strings'
                         .format(translation_id))
     except AttributeError:
-        raise AttributeError('Cannot use {} as \'translation_id\', there'
-                             'appear to be items without these metadata'
+        raise AttributeError('Cannot use {} as \'translation_id\', there '
+                             'appear to be items without these metadata '
                              'attributes'.format(translation_id))
 
     for id_vals, items in groupby(content_list, attrgetter(*translation_id)):
@@ -637,7 +644,7 @@ def get_original_items(items, with_str):
     def _warn_source_paths(msg, items, *extra):
         args = [len(items)]
         args.extend(extra)
-        args.extend((x.source_path for x in items))
+        args.extend(x.source_path for x in items)
         logger.warning('{}: {}'.format(msg, '\n%s' * len(items)), *args)
 
     # warn if several items have the same lang
@@ -721,7 +728,7 @@ def order_content(content_list, order_by='slug'):
                                 })
         else:
             logger.warning(
-                'Invalid *_ORDER_BY setting (%s).'
+                'Invalid *_ORDER_BY setting (%s). '
                 'Valid options are strings and functions.', order_by)
 
     return content_list
